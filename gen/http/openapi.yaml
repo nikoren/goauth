@@ -1,0 +1,87 @@
+swagger: "2.0"
+info:
+  title: Security Example API
+  description: This API demonstrates the use of the goa security DSL
+  version: ""
+host: 0.0.0.0:8080
+consumes:
+- application/json
+- application/xml
+- application/gob
+produces:
+- application/json
+- application/xml
+- application/gob
+paths:
+  /secure:
+    post:
+      tags:
+      - oauth_secured
+      summary: method oauth_secured
+      description: This action requires secured oauth scopes.
+      operationId: oauth_secured#method
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        type: string
+      - name: MethodRequestBody
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/OauthSecuredMethodRequestBody'
+          required:
+          - data
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            type: string
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/OauthSecuredMethodUnauthorizedResponseBody'
+        "403":
+          description: Forbidden response.
+          schema:
+            $ref: '#/definitions/OauthSecuredMethodInvalidScopesResponseBody'
+      schemes:
+      - http
+      security:
+      - oauth2_header_Authorization:
+        - scheduler
+definitions:
+  OauthSecuredMethodInvalidScopesResponseBody:
+    title: OauthSecuredMethodInvalidScopesResponseBody
+    type: string
+    description: Token scopes are invalid
+    example: Sapiente fugit ratione facilis.
+  OauthSecuredMethodRequestBody:
+    title: OauthSecuredMethodRequestBody
+    type: object
+    properties:
+      data:
+        type: string
+        example: Sint animi.
+    example:
+      data: Enim consequatur.
+    required:
+    - data
+  OauthSecuredMethodUnauthorizedResponseBody:
+    title: OauthSecuredMethodUnauthorizedResponseBody
+    type: string
+    description: Credentials are invalid
+    example: Aut et quasi libero.
+securityDefinitions:
+  oauth2_header_Authorization:
+    type: oauth2
+    description: "Secures endpoint by requiring a valid OAuth2 \n\t\ttoken retrieved
+      via the signin endpoint. \n\t\tSupports scopes \"api:read\" and \"api:write\"."
+    flow: accessCode
+    authorizationUrl: http://goa.design/authorization
+    tokenUrl: http://goa.design/token
+    scopes:
+      scheduler: Scheduler access
+externalDocs:
+  description: Security example README
+  url: https://github.com/goadesign/goa/tree/master/example/security/README.md
